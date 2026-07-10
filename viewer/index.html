@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenQuery — evidence explorer</title>
+<link rel="stylesheet" href="app.css" id="app-css">
+</head>
+<body>
+<header class="topbar">
+  <div class="question">
+    <span class="label">QUESTION</span>
+    <span id="question-text">Loading…</span>
+  </div>
+  <div class="badges">
+    <span class="badge badge-safety" id="safety-badge">🔒 READ-ONLY</span>
+    <span class="badge badge-asserted" title="Nodes and edges were assembled by the AI agent; each receipt shows the exact SQL behind its edge. v2 derives the graph from the queries themselves and removes this badge.">graph: agent-asserted (v1)</span>
+  </div>
+</header>
+<main class="main">
+  <div id="graph-canvas" class="canvas"></div>
+  <aside class="panel" id="panel">
+    <div id="panel-empty" class="panel-empty">Click an edge or node to see its receipt.</div>
+    <div id="panel-content" hidden>
+      <h3 id="panel-title"></h3>
+      <pre class="sql" id="panel-sql"></pre>
+      <dl class="kv" id="panel-kv"></dl>
+      <h4 class="rows-title" id="rows-title" hidden>SAMPLED ROWS</h4>
+      <div class="rows-wrap"><table id="panel-rows"></table></div>
+    </div>
+  </aside>
+</main>
+<footer class="footer">
+  <span>● every edge backed by a SQL receipt</span>
+  <span id="counts"></span>
+  <span>openquery v0.1 — localhost only</span>
+</footer>
+<div id="error-banner" class="error-banner" hidden></div>
+<script src="force-graph.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

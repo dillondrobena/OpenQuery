@@ -1,4 +1,5 @@
 import { promises as fs } from 'node:fs';
+import path from 'node:path';
 
 /*
  * Advisory lockfile for PGlite data dirs (strictly single-connection engine,
@@ -28,6 +29,7 @@ export class LockTimeoutError extends Error {
 }
 
 export async function acquireLock(lockPath: string, timeoutMs = 15_000): Promise<() => Promise<void>> {
+  await fs.mkdir(path.dirname(lockPath), { recursive: true });
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     try {
