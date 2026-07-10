@@ -58,3 +58,17 @@ th { background: var(--bg); color: var(--muted); }
   position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
   background: #7a2020; color: #fff; padding: 10px 18px; border-radius: 6px; font-size: 12px;
 }
+
+/* Narrow viewports: inspector stacks under the graph instead of crushing it. */
+@media (max-width: 768px) {
+  .topbar { flex-wrap: wrap; }
+  .question { order: 2; width: 100%; }
+  .badges { order: 1; margin-left: auto; }
+  .main { flex-direction: column; }
+  .canvas { flex: 1 1 55%; min-height: 0; }
+  .panel {
+    flex: 0 0 45%; width: 100%; max-width: none;
+    border-left: none; border-top: 1px solid var(--border);
+  }
+  .footer { flex-wrap: wrap; gap: 8px 16px; }
+}

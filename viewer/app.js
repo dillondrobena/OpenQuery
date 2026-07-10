@@ -175,8 +175,11 @@
       graph.onEngineStop(fitOnce);
       setTimeout(fitOnce, 1800);
 
+      var refitTimer = null;
       window.addEventListener('resize', function () {
         graph.width(canvasEl.clientWidth).height(canvasEl.clientHeight);
+        clearTimeout(refitTimer);
+        refitTimer = setTimeout(function () { graph.zoomToFit(300, 90); }, 300);
       });
       window.__oqGraph = graph; // for automated QA (screen-coord lookups)
     })
