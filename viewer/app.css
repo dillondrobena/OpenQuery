@@ -27,6 +27,7 @@ body {
   display: flex; justify-content: space-between; align-items: center; gap: 16px;
   padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--border);
 }
+.brand { color: var(--accent); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; flex-shrink: 0; }
 .question .label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
 .question { font-size: 14px; min-width: 0; }
 .badges { display: flex; gap: 8px; flex-shrink: 0; }
