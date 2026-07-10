@@ -5,3 +5,4 @@ coverage/
 .openquery/
 .gstack/
 .claude/skills/openquery/
+graph.json
