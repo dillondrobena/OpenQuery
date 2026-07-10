@@ -26,6 +26,22 @@ receipts. Design record: ~/.gstack/projects/OpenQuery/ (design doc + test plan).
 - `TEST_PG_URL=postgres://...` enables the node-postgres parity suite (CI does).
 - `npm run typecheck` / `npm run build` (tsc, ESM NodeNext).
 
+## Release
+
+- Two version files, always bumped together: `VERSION` holds 4-digit
+  `MAJOR.MINOR.PATCH.MICRO` (gstack-internal); `package.json` holds the 3-digit
+  npm semver. Any npm-visible release must bump at least PATCH.
+- Ritual: bump both files → add CHANGELOG entry (user-voiced, dated) →
+  `git tag v<MAJOR.MINOR.PATCH.MICRO>` → push the tag. `release.yml` tests,
+  builds, and runs `npm publish --provenance`.
+- Publishing is **npm Trusted Publishing (OIDC)** — the workflow authenticates
+  by identity, no token exists anywhere. Never add an npm token or suggest
+  token-based publishing; it will fail (and shouldn't be fixed by adding one).
+- npm cannot republish an existing version; failed releases of an unpublished
+  version can be retried via the workflow's manual dispatch.
+- `gh` CLI is not installed on this machine — check CI via the public GitHub
+  API or the Actions web UI.
+
 ## Invariants (do not weaken)
 
 - Credentials: interactive `connect` prompt is the ONLY entry path — no args,

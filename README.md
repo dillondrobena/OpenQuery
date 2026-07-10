@@ -1,5 +1,8 @@
 # OpenQuery
 
+[![npm version](https://img.shields.io/npm/v/openquery)](https://www.npmjs.com/package/openquery)
+[![CI](https://github.com/dillondrobena/OpenQuery/actions/workflows/ci.yml/badge.svg)](https://github.com/dillondrobena/OpenQuery/actions/workflows/ci.yml)
+
 **Evidence explorer for databases.** Ask an AI agent questions about your
 Postgres data — get back an interactive entity graph where **every edge carries
 a SQL receipt**: the exact query, bound parameters, join path, and sampled rows
@@ -65,7 +68,9 @@ openquery graph --input graph.json                # evidence explorer on localho
   output, audit log, or viewer payload (CI enforces this with a canary test).
 - **The viewer serves rows to your browser** on 127.0.0.1 behind a random URL
   token. The token is a local-process guard; browser cache, extensions, and
-  devtools are still your machine's trust domain.
+  devtools are still your machine's trust domain. Detached viewers
+  (`graph --no-wait`) shut themselves down after 4 hours so forgotten servers
+  don't hold data forever.
 - **A SELECT can still be expensive — or privileged.** Timeouts and row caps
   bound runtime, but on a superuser connection even read-only functions like
   `pg_read_file()` reveal more than table data. The strongest fence is
