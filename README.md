@@ -90,8 +90,10 @@ npm test          # guard matrix, executor parity, E2E CLI, canary, drift gate
 npm run build
 ```
 
-Architecture and the safety model are documented in [CLAUDE.md](./CLAUDE.md);
-deferred work with full context lives in [TODOS.md](./TODOS.md). The Graph JSON
+Want to contribute? Start with [CONTRIBUTING.md](./CONTRIBUTING.md) — setup,
+test house rules, and a curated backlog. Architecture and the safety model are
+documented in [CLAUDE.md](./CLAUDE.md); deferred work with full context lives
+in [TODOS.md](./TODOS.md). The Graph JSON
 contract is [schema/graph.schema.json](./schema/graph.schema.json) (frozen v1);
 the SKILL.md example is CI-validated against it so the two cannot drift.
 
