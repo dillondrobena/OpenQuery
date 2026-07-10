@@ -3,13 +3,14 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch: # manual retry without re-tagging
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # npm provenance
+      id-token: write # OIDC trusted publishing + provenance — no npm token anywhere
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,10 +18,12 @@ jobs:
           node-version: 22
           cache: npm
           registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm >= 11.5.1 (runner ships older)
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # No NODE_AUTH_TOKEN: npm detects the OIDC environment and authenticates
+      # via the Trusted Publisher configured on npmjs.com for this repo+workflow.
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
