@@ -53,7 +53,12 @@
 
   function renderReceipt(title, receipt, extraPairs) {
     el('panel-empty').hidden = true;
-    el('panel-content').hidden = false;
+    var content = el('panel-content');
+    content.hidden = false;
+    // Retrigger the entrance animation on content swap.
+    content.style.animation = 'none';
+    void content.offsetWidth;
+    content.style.animation = '';
     el('panel-title').textContent = title;
     el('panel-sql').innerHTML = receipt ? highlightSql(receipt.sql) : '(no receipt)';
 
