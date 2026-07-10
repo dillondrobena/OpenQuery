@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "openquery": "./dist/cli/index.js"
+    "openquery": "dist/cli/index.js"
   },
   "files": [
     "dist/",
