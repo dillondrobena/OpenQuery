@@ -98,24 +98,21 @@ export async function graphCommand(
     throw new CliError('VIEWER_ERROR', `could not read ${opts.input}: ${err.message}`);
   });
   const doc = await validateGraphDocument(raw);
-
-  const served = await serveGraph(doc);
-  registerCleanup(served.close);
-  process.stdout.write(
-    `Evidence explorer: ${served.url}\n` +
-      `${doc.nodes.length} nodes, ${doc.edges.length} edges. Graph is agent-asserted (v1); receipts show the SQL behind each edge.\n`
-  );
-  openInBrowser(served.url);
+  const summary = `${doc.nodes.length} nodes, ${doc.edges.length} edges. Graph is agent-asserted (v1); receipts show the SQL behind each edge.\n`;
 
   if (opts.wait) {
-    process.stdout.write('Serving until Ctrl+C.\n');
+    const served = await serveGraph(doc);
+    registerCleanup(served.close);
+    process.stdout.write(`Evidence explorer: ${served.url}\n${summary}Serving until Ctrl+C.\n`);
+    openInBrowser(served.url);
     await new Promise(() => {}); // SIGINT handler closes the server
   } else {
-    // --no-wait: hand the server to a detached child and exit.
+    // --no-wait: exactly ONE server and ONE URL — the detached child's.
+    // (Dogfooding found the old serve-close-respawn flow printed two URLs,
+    // the first of them dead.)
     const { spawn } = await import('node:child_process');
     const self = fileURLToPath(import.meta.url);
     const cliEntry = path.resolve(path.dirname(self), '..', 'index.js');
-    await served.close();
     const child = spawn(process.execPath, [cliEntry, '__serve', path.resolve(opts.input)], {
       detached: true,
       stdio: ['ignore', 'pipe', 'ignore'],
@@ -131,7 +128,7 @@ export async function graphCommand(
     });
     child.unref();
     if (url) {
-      process.stdout.write(`Detached viewer: ${url}\n`);
+      process.stdout.write(`Evidence explorer (detached): ${url}\n${summary}`);
       openInBrowser(url);
     } else {
       throw new CliError('VIEWER_ERROR', 'detached viewer did not report a URL within 10s');

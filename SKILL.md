@@ -43,13 +43,20 @@ openquery schema mydb --table transactions # column detail for one table
 openquery schema mydb --filter 'tx*'       # scoped summary
 ```
 
+`estimated_rows: null` means the table has never been ANALYZEd (common on fresh
+databases) — it does not mean the table is empty.
+
 ### 2. Query (guarded, read-only, parameterized)
 
 ```bash
 openquery query mydb \
-  --sql "SELECT t.id, t.amount, t.created_at FROM transactions t JOIN accounts a ON a.id = t.account_id JOIN companies c ON c.id = t.company_id WHERE a.user_id = \$1 AND c.name = \$2 ORDER BY t.created_at DESC" \
+  --sql 'SELECT t.id, t.amount, t.created_at FROM transactions t JOIN accounts a ON a.id = t.account_id JOIN companies c ON c.id = t.company_id WHERE a.user_id = $1 AND c.name = $2 ORDER BY t.created_at DESC' \
   --params '[42, "Globex"]'
 ```
+
+**Shell-quoting hazard:** single-quote the `--sql` string. In double quotes the
+shell expands `$1`/`$2` to nothing before the CLI ever sees them, and you get a
+confusing `PARSE_ERROR: syntax error at end of input`.
 
 The envelope you get back: up to 20 sample rows, `rowCount`, `truncated`,
 `columns`, and a `receipt` containing `sql`, `params`, `rowCount`,
@@ -62,7 +69,9 @@ Need every row (for the viewer or a file)? Add `--out rows.json`.
 
 One node per entity, one edge per relationship claim. **Every edge must carry
 the receipt of the query that proves it.** Copy `joinPath`, `ranAt`, and
-`durationMs` from the envelope receipts.
+`durationMs` from the envelope receipts. `receipt.sampledRows` is a subset
+(up to ~4 is plenty; hard max 50) of the envelope's `rows` array, copied as-is
+— it's the "show me" evidence in the viewer's panel.
 
 ```json
 {
@@ -128,5 +137,6 @@ Zero rows is **success** (`rowCount: 0`), not an error.
 
 `openquery demo --serve-db` seeds a local embedded Postgres (users, accounts,
 transactions, companies) and registers the `demo` alias — then run the full
-workflow above against `demo`. (`openquery demo` alone runs the whole flagship
-pipeline canned, no agent needed.)
+workflow above against `demo`. It is idempotent: safe to run even if the alias
+already exists. (`openquery demo` alone runs the whole flagship pipeline
+canned, no agent needed.)

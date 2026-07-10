@@ -4,3 +4,4 @@ coverage/
 *.tsbuildinfo
 .openquery/
 .gstack/
+.claude/skills/openquery/

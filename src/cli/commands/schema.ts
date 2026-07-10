@@ -9,7 +9,8 @@ import { executorForAlias } from '../resolve.js';
  */
 
 const SUMMARY_TABLES_SQL = `
-  SELECT n.nspname AS schema, c.relname AS table, c.reltuples::bigint AS estimated_rows
+  SELECT n.nspname AS schema, c.relname AS table,
+         CASE WHEN c.reltuples < 0 THEN NULL ELSE c.reltuples::bigint END AS estimated_rows
   FROM pg_class c
   JOIN pg_namespace n ON n.oid = c.relnamespace
   WHERE c.relkind = 'r' AND n.nspname NOT IN ('pg_catalog', 'information_schema')

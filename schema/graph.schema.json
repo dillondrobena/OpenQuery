@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://openquery.dev/schema/graph.schema.json",
   "title": "OpenQuery Graph JSON v1",
-  "description": "Contract between agent, CLI, and viewer. v1-draft until SKILL.md dogfooding ratifies it. Node ids are opaque unique strings; '<type>:<pk>' is a recommended convention, not a requirement. numeric/int8 values appear as strings, never floats.",
+  "description": "Contract between agent, CLI, and viewer. FROZEN v1 (ratified by clean-room SKILL.md dogfooding, 2026-07-10 — a fresh agent assembled valid graphs with no contract changes). Node ids are opaque unique strings; '<type>:<pk>' is a recommended convention, not a requirement. numeric/int8 values appear as strings, never floats. Breaking changes require version 2.",
   "type": "object",
   "required": ["version", "question", "nodes", "edges"],
   "additionalProperties": false,
