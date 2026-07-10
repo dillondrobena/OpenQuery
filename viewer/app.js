@@ -129,6 +129,15 @@
         })
         .onBackgroundClick(clearPanel);
 
+      // The graph is the hero: fill the canvas once the layout settles.
+      var didFit = false;
+      graph.onEngineStop(function () {
+        if (!didFit) {
+          didFit = true;
+          graph.zoomToFit(400, 80);
+        }
+      });
+
       window.addEventListener('resize', function () {
         graph.width(canvasEl.clientWidth).height(canvasEl.clientHeight);
       });
