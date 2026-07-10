@@ -16,8 +16,10 @@ import { validateGraphDocument } from '../src/cli/commands/graph.js';
 
 describe('SKILL.md contract drift gate', () => {
   it('the embedded Graph JSON example validates against graph.schema.json', async () => {
+    // CRLF-tolerant: Windows checkouts with core.autocrlf=true deliver \r\n
+    // (first CI run failed exactly here).
     const skill = readFileSync('SKILL.md', 'utf8');
-    const blocks = [...skill.matchAll(/```json\n([\s\S]*?)```/g)].map((m) => m[1]!);
+    const blocks = [...skill.matchAll(/```json\r?\n([\s\S]*?)```/g)].map((m) => m[1]!);
     const graphBlock = blocks.find((b) => b.includes('"version": 1') && b.includes('"nodes"'));
     expect(graphBlock, 'SKILL.md must contain a Graph JSON example').toBeDefined();
     const doc = await validateGraphDocument(graphBlock!);

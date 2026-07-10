@@ -1,0 +1,4 @@
+# Normalize to LF in the repo and on checkout, regardless of platform git config.
+# The first Windows CI run failed because autocrlf=true delivered CRLF SKILL.md.
+* text=auto eol=lf
+*.png binary
