@@ -25,6 +25,24 @@
 
   var SQL_KEYWORDS = /\b(SELECT|FROM|JOIN|LEFT|RIGHT|INNER|OUTER|LATERAL|ON|WHERE|AND|OR|GROUP BY|ORDER BY|LIMIT|WITH|AS|UNION|ANY|EXPLAIN|COUNT|SUM|DESC|ASC)\b/gi;
 
+  // One color system: the canvas reads the same CSS custom properties the DOM
+  // uses, so the graph follows prefers-color-scheme instead of hardcoding hex.
+  var rootStyle = getComputedStyle(document.documentElement);
+  function themeVar(name) { return rootStyle.getPropertyValue(name).trim(); }
+  var THEME = {
+    nodeUser: themeVar('--node-user'),
+    node: themeVar('--node'),
+    edge: themeVar('--edge'),
+    edgeHover: themeVar('--edge-hover'),
+    labelBorder: themeVar('--label-border'),
+  };
+  if (window.matchMedia) {
+    // Simple + correct: a scheme flip re-reads everything.
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      location.reload();
+    });
+  }
+
   function highlightSql(sql) {
     return esc(sql).replace(SQL_KEYWORDS, function (kw) { return '<span class="kw">' + kw + '</span>'; });
   }
@@ -82,6 +100,7 @@
       var maxWeight = Math.max.apply(null, weights.concat([1]));
 
       var canvasEl = el('graph-canvas');
+      var hoveredLink = null;
       var graph = ForceGraph()(canvasEl)
         .width(canvasEl.clientWidth)   // force-graph defaults to window size,
         .height(canvasEl.clientHeight) // which shoves the panel off-screen
@@ -99,7 +118,7 @@
           var radius = (node.type === 'user' ? 14 : 11) / scale;
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
-          ctx.fillStyle = node.type === 'user' ? '#3a6fe8' : '#8b93a1';
+          ctx.fillStyle = node.type === 'user' ? THEME.nodeUser : THEME.node;
           ctx.fill();
           var fontSize = 12 / scale;
           ctx.font = fontSize + 'px ' + getComputedStyle(document.body).fontFamily;
@@ -115,7 +134,7 @@
         })
         .linkWidth(function (link) { return 1 + 5 * (link.weight / maxWeight); })
         .linkLabel('label')
-        .linkColor(function () { return '#8b93a166'; })
+        .linkColor(function (link) { return link === hoveredLink ? THEME.edgeHover : THEME.edge; })
         .linkCanvasObjectMode(function () { return 'after'; })
         .linkCanvasObject(function (link, ctx, scale) {
           // The edge label IS the answer ($ total · txn count) — always visible,
@@ -130,7 +149,7 @@
           var width = ctx.measureText(link.label).width;
           var bodyStyle = getComputedStyle(document.body);
           ctx.fillStyle = bodyStyle.backgroundColor;
-          ctx.strokeStyle = '#8b93a180';
+          ctx.strokeStyle = link === hoveredLink ? THEME.edgeHover : THEME.labelBorder;
           ctx.lineWidth = 1 / scale;
           var x = midX - width / 2 - padX;
           var y = midY - fontSize / 2 - padY;
@@ -160,7 +179,15 @@
           if (node.pk !== undefined) pairs.push(['pk', JSON.stringify(node.pk)]);
           renderReceipt('NODE — ' + node.label, null, pairs);
         })
-        .onBackgroundClick(clearPanel);
+        .onBackgroundClick(clearPanel)
+        // Clickable things must look clickable: pointer cursor + edge highlight.
+        .onLinkHover(function (link) {
+          hoveredLink = link;
+          canvasEl.style.cursor = link ? 'pointer' : 'auto';
+        })
+        .onNodeHover(function (node) {
+          canvasEl.style.cursor = node || hoveredLink ? 'pointer' : 'auto';
+        });
 
       // The graph is the hero: fill the canvas once the layout settles.
       // Fallback timer covers the case where the engine settled before the

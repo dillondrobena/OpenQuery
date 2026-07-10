@@ -1,13 +1,21 @@
 /* OpenQuery evidence explorer — an instrument, not a landing page. */
 * { box-sizing: border-box; margin: 0; }
 :root {
+  color-scheme: dark light;
   --bg: #0f1115; --surface: #171a21; --border: #2a2f3a;
   --text: #d7dce3; --muted: #8b93a1; --accent: #e8863a; --safe: #4cae6e;
+  /* Canvas palette — read by app.js so the graph follows the theme. */
+  --node-user: #5b8def; --node: #6b7382; --edge: rgba(139, 147, 161, 0.4);
+  --edge-hover: #e8863a; --label-border: rgba(139, 147, 161, 0.5);
+  --danger-bg: #7a2020; --danger-text: #ffffff;
 }
 @media (prefers-color-scheme: light) {
   :root {
     --bg: #f7f8fa; --surface: #ffffff; --border: #d8dce3;
     --text: #23272e; --muted: #6a7280; --accent: #c05f10; --safe: #2e7d4f;
+    --node-user: #2f5fd0; --node: #8b93a1; --edge: rgba(107, 115, 130, 0.45);
+    --edge-hover: #c05f10; --label-border: rgba(107, 115, 130, 0.6);
+    --danger-bg: #b3261e; --danger-text: #ffffff;
   }
 }
 body {
