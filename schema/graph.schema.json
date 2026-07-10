@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://openquery.dev/schema/graph.schema.json",
+  "title": "OpenQuery Graph JSON v1",
+  "description": "Contract between agent, CLI, and viewer. v1-draft until SKILL.md dogfooding ratifies it. Node ids are opaque unique strings; '<type>:<pk>' is a recommended convention, not a requirement. numeric/int8 values appear as strings, never floats.",
+  "type": "object",
+  "required": ["version", "question", "nodes", "edges"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "question": { "type": "string", "minLength": 1 },
+    "connection": { "type": "string" },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5000,
+      "items": { "$ref": "#/definitions/node" }
+    },
+    "edges": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": { "$ref": "#/definitions/edge" }
+    }
+  },
+  "definitions": {
+    "node": {
+      "type": "object",
+      "required": ["id", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string" },
+        "label": { "type": "string", "minLength": 1 },
+        "sourceTable": { "type": "string" },
+        "sourceSchema": { "type": "string" },
+        "pk": {
+          "description": "Primary key value; object form supports composite keys.",
+          "oneOf": [
+            { "type": "number" },
+            { "type": "string" },
+            { "type": "object", "additionalProperties": { "type": ["number", "string"] } }
+          ]
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": ["id", "source", "target", "receipt"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" },
+        "weight": { "type": "number", "minimum": 0 },
+        "receipt": { "$ref": "#/definitions/receipt" }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "required": ["sql", "params", "rowCount"],
+      "additionalProperties": false,
+      "properties": {
+        "sql": { "type": "string", "minLength": 1 },
+        "params": { "type": "array" },
+        "rowCount": { "type": "integer", "minimum": 0 },
+        "sampledRows": {
+          "type": "array",
+          "maxItems": 50,
+          "items": { "type": "object" }
+        },
+        "joinPath": {
+          "description": "Tables referenced by the query, in order of appearance. Computed by the CLI from the query AST — not agent-supplied.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ranAt": { "type": "string", "format": "date-time" },
+        "durationMs": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
