@@ -29,6 +29,23 @@ Deferred work with context. Generated during /plan-eng-review on 2026-07-09; des
 - **Context:** Flagged in eng-review performance section; not a v1 blocker at human timescales. ~20-minute task.
 - **Depends on:** Nothing.
 
+## Keyboard navigation for the viewer graph (FINDING-012, /design-review 2026-07-10)
+
+- **What:** A keyboard path to the viewer's core interaction: roving focus across nodes/edges (Tab/arrows), Enter opens the receipt, Escape clears. Announce selection to assistive tech.
+- **Why:** Every receipt today requires a mouse click on a canvas. Keyboard and screen-reader users cannot reach the product's core function. Flagged high by both outside voices (Codex + Claude subagent) in the design review.
+- **Pros:** Closes the one a11y-critical gap; the aria-live panel (FINDING-008) already announces content once selection works.
+- **Cons:** Canvas-based graphs have no free a11y — needs a focus model, visible focus indicator drawn on canvas, and key handling that coexists with force-graph's zoom/pan.
+- **Context:** viewer/app.js registers onNodeClick/onLinkClick handlers; a keyboard layer can reuse renderReceipt() directly (the same path automated QA uses). Design audit: ~/.gstack/projects/OpenQuery/designs/design-audit-20260710/.
+- **Depends on:** nothing; viewer-only.
+
+## Mobile edge-label declutter (polish, /design-review 2026-07-10)
+
+- **What:** On narrow viewports/tight clusters, edge label pills overlap ("$48,200" over "Dana Reyes" at 375px). Hide labels below a zoom threshold on touch, or offset/fan overlapping labels.
+- **Why:** Mobile is now structurally sound (stacked layout) but dense graphs get noisy at phone width.
+- **Pros:** Cheap heuristic (skip label when pill width > edge screen length). **Cons:** Pure polish; pinch-zoom already mitigates.
+- **Context:** viewer/app.js linkCanvasObject; label drawing is one function.
+- **Depends on:** nothing.
+
 ## Optional MCP adapter (alias-only)
 
 - **What:** Thin MCP server wrapping the same CLI core for MCP-only hosts.
