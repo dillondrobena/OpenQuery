@@ -64,8 +64,10 @@ th { background: var(--bg); color: var(--muted); }
   background: var(--surface); border-top: 1px solid var(--border);
 }
 .error-banner {
-  position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
-  background: #7a2020; color: #fff; padding: 10px 18px; border-radius: 6px; font-size: 12px;
+  /* Corner toast: no assumptions about header height, themed, bounded width. */
+  position: fixed; top: 8px; right: 8px; max-width: 60ch;
+  background: var(--danger-bg); color: var(--danger-text);
+  padding: 10px 16px; border-radius: 6px; font-size: 12px;
 }
 
 /* Narrow viewports: inspector stacks under the graph instead of crushing it. */

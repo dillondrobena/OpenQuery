@@ -15,6 +15,10 @@
     var banner = el('error-banner');
     banner.textContent = message;
     banner.hidden = false;
+    // Never leave the header stuck on "Loading…" under an error.
+    if (el('question-text').textContent === 'Loading…') {
+      el('question-text').textContent = '(no graph loaded)';
+    }
   }
 
   function esc(value) {
