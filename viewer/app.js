@@ -94,20 +94,22 @@
         .nodeId('id')
         .nodeLabel(function (n) { return (n.type ? n.type.toUpperCase() + ': ' : '') + n.label; })
         .nodeCanvasObject(function (node, ctx, scale) {
-          var radius = node.type === 'user' ? 10 : 8;
+          // Constant SCREEN size (divide by scale): zoom controls spacing,
+          // not dot/label size — small graphs fill the canvas without ballooning.
+          var radius = (node.type === 'user' ? 14 : 11) / scale;
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI);
           ctx.fillStyle = node.type === 'user' ? '#3a6fe8' : '#8b93a1';
           ctx.fill();
-          var fontSize = Math.max(11 / scale, 3);
-          ctx.font = fontSize + 'px monospace';
+          var fontSize = 12 / scale;
+          ctx.font = fontSize + 'px ' + getComputedStyle(document.body).fontFamily;
           ctx.textAlign = 'center';
           ctx.fillStyle = getComputedStyle(document.body).color;
-          ctx.fillText(node.label, node.x, node.y + radius + fontSize + 2);
+          ctx.fillText(node.label, node.x, node.y + radius + fontSize * 1.3);
         })
-        .nodePointerAreaPaint(function (node, color, ctx) {
+        .nodePointerAreaPaint(function (node, color, ctx, scale) {
           ctx.beginPath();
-          ctx.arc(node.x, node.y, 14, 0, 2 * Math.PI);
+          ctx.arc(node.x, node.y, 22 / scale, 0, 2 * Math.PI); // ~44px touch target
           ctx.fillStyle = color;
           ctx.fill();
         })
@@ -130,13 +132,17 @@
         .onBackgroundClick(clearPanel);
 
       // The graph is the hero: fill the canvas once the layout settles.
+      // Fallback timer covers the case where the engine settled before the
+      // handler could observe it.
       var didFit = false;
-      graph.onEngineStop(function () {
+      function fitOnce() {
         if (!didFit) {
           didFit = true;
-          graph.zoomToFit(400, 80);
+          graph.zoomToFit(400, 90);
         }
-      });
+      }
+      graph.onEngineStop(fitOnce);
+      setTimeout(fitOnce, 1800);
 
       window.addEventListener('resize', function () {
         graph.width(canvasEl.clientWidth).height(canvasEl.clientHeight);
