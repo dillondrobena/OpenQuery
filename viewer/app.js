@@ -116,6 +116,37 @@
         .linkWidth(function (link) { return 1 + 5 * (link.weight / maxWeight); })
         .linkLabel('label')
         .linkColor(function () { return '#8b93a166'; })
+        .linkCanvasObjectMode(function () { return 'after'; })
+        .linkCanvasObject(function (link, ctx, scale) {
+          // The edge label IS the answer ($ total · txn count) — always visible,
+          // not a hover secret. Constant screen size, pill background for legibility.
+          if (!link.label) return;
+          var midX = (link.source.x + link.target.x) / 2;
+          var midY = (link.source.y + link.target.y) / 2;
+          var fontSize = 11 / scale;
+          ctx.font = fontSize + 'px ' + getComputedStyle(document.body).fontFamily;
+          var padX = 6 / scale;
+          var padY = 3 / scale;
+          var width = ctx.measureText(link.label).width;
+          var bodyStyle = getComputedStyle(document.body);
+          ctx.fillStyle = bodyStyle.backgroundColor;
+          ctx.strokeStyle = '#8b93a180';
+          ctx.lineWidth = 1 / scale;
+          var x = midX - width / 2 - padX;
+          var y = midY - fontSize / 2 - padY;
+          var w = width + padX * 2;
+          var h = fontSize + padY * 2;
+          var r = h / 2;
+          ctx.beginPath();
+          ctx.roundRect(x, y, w, h, r);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = bodyStyle.color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(link.label, midX, midY);
+          ctx.textBaseline = 'alphabetic';
+        })
         .onLinkClick(function (link) {
           renderReceipt(
             'EDGE RECEIPT — ' + link.source.label + ' ↔ ' + link.target.label,
