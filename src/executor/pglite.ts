@@ -4,6 +4,7 @@ import { acquireLock } from './lockfile.js';
 import {
   DEFAULT_MAX_ROWS,
   DEFAULT_TIMEOUT_MS,
+  sanitizeLimit,
   type Executor,
   type QueryOptions,
   type QueryOutcome,
@@ -57,8 +58,8 @@ export class PgliteExecutor implements Executor {
 
   async query(sql: string, opts: QueryOptions = {}): Promise<QueryOutcome> {
     const db = await this.open();
-    const maxRows = opts.maxRows ?? DEFAULT_MAX_ROWS;
-    const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    const maxRows = sanitizeLimit(opts.maxRows, DEFAULT_MAX_ROWS);
+    const timeoutMs = sanitizeLimit(opts.timeoutMs, DEFAULT_TIMEOUT_MS);
     const started = Date.now();
 
     await db.exec('BEGIN TRANSACTION READ ONLY');

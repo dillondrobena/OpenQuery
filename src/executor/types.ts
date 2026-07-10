@@ -33,3 +33,8 @@ export interface Executor {
 
 export const DEFAULT_MAX_ROWS = 500;
 export const DEFAULT_TIMEOUT_MS = 10_000;
+
+/** NaN/zero/negative silently disabled the cap (adversarial finding) — sanitize at the executor boundary too, not just the CLI. */
+export function sanitizeLimit(value: number | undefined, fallback: number): number {
+  return Number.isInteger(value) && (value as number) > 0 ? (value as number) : fallback;
+}

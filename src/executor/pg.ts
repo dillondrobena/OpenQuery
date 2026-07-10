@@ -4,6 +4,7 @@ import { parse as parseConnectionString } from 'pg-connection-string';
 import {
   DEFAULT_MAX_ROWS,
   DEFAULT_TIMEOUT_MS,
+  sanitizeLimit,
   type Executor,
   type QueryOptions,
   type QueryOutcome,
@@ -66,24 +67,30 @@ export class PgExecutor implements Executor {
     }
   }
 
-  /** Best-effort role write-grant check (labeled best-effort in all output). */
+  /** Best-effort role write-grant check (labeled best-effort in all output).
+   *  Superusers have implicit privileges that never appear in role_table_grants —
+   *  check rolsuper/rolbypassrls explicitly or the warning misses exactly the
+   *  connections that most need it (adversarial finding). */
   async roleHasWriteGrants(): Promise<boolean> {
     const client = await this.pool.connect();
     try {
       const result = await client.query(
-        `SELECT count(*)::int AS n FROM information_schema.role_table_grants
-         WHERE grantee = current_user
-           AND privilege_type IN ('INSERT','UPDATE','DELETE','TRUNCATE')`
+        `SELECT
+           (SELECT count(*)::int FROM information_schema.role_table_grants
+            WHERE grantee = current_user
+              AND privilege_type IN ('INSERT','UPDATE','DELETE','TRUNCATE')) AS grants,
+           (SELECT rolsuper OR rolbypassrls FROM pg_roles WHERE rolname = current_user) AS elevated`
       );
-      return (result.rows[0]?.n ?? 0) > 0;
+      const row = result.rows[0] ?? {};
+      return (row.grants ?? 0) > 0 || row.elevated === true;
     } finally {
       client.release();
     }
   }
 
   async query(sql: string, opts: QueryOptions = {}): Promise<QueryOutcome> {
-    const maxRows = opts.maxRows ?? DEFAULT_MAX_ROWS;
-    const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    const maxRows = sanitizeLimit(opts.maxRows, DEFAULT_MAX_ROWS);
+    const timeoutMs = sanitizeLimit(opts.timeoutMs, DEFAULT_TIMEOUT_MS);
     const started = Date.now();
     const client = await this.pool.connect();
     try {

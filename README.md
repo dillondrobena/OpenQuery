@@ -66,9 +66,13 @@ openquery graph --input graph.json                # evidence explorer on localho
 - **The viewer serves rows to your browser** on 127.0.0.1 behind a random URL
   token. The token is a local-process guard; browser cache, extensions, and
   devtools are still your machine's trust domain.
-- **A SELECT can still be expensive.** Timeouts and row caps bound it; the
-  strongest fence is connecting with a minimally-privileged read-only role
-  (`connect` warns — best-effort — when the role has write grants).
+- **A SELECT can still be expensive — or privileged.** Timeouts and row caps
+  bound runtime, but on a superuser connection even read-only functions like
+  `pg_read_file()` reveal more than table data. The strongest fence is
+  connecting with a minimally-privileged read-only role (`connect` warns —
+  best-effort, including superuser detection — when the role is over-privileged).
+- **`sslmode=require` / `ssl=true` means TLS without certificate verification**
+  (libpq `require` semantics). Use `sslmode=verify-full` for verified TLS.
 - **The audit log** (`~/.openquery/audit.jsonl`) records SQL + params, never
   result rows. Params can contain sensitive literals; redaction is on the
   roadmap ([TODOS](./TODOS.md)).

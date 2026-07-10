@@ -46,6 +46,14 @@ Deferred work with context. Generated during /plan-eng-review on 2026-07-09; des
 - **Context:** viewer/app.js linkCanvasObject; label drawing is one function.
 - **Depends on:** nothing.
 
+## Admin/filesystem function denylist in the guard (adversarial review, 2026-07-10)
+
+- **What:** Reject (or gate behind a flag) SELECTs calling admin/filesystem functions: `pg_read_file`, `pg_ls_dir`, `pg_read_binary_file`, `lo_import/export`, `dblink*`, plus direct reads of `pg_authid`/`pg_shadow`.
+- **Why:** On a superuser connection these are "read-only" but reveal server files and password hashes — technically consistent with the promise, practically an embarrassing demo (`SELECT pg_read_file('/etc/passwd')`).
+- **Pros:** Closes the gap between the literal and the implied safety promise. **Cons:** Function denylists are never complete (extensions add more); the honest fence remains the read-only role, which the docs and the superuser warning now push hard.
+- **Context:** Flagged P2/confidence-6 by the pre-publish adversarial review. v0.1.0.0 mitigations: superuser detection in the connect warning + README language. The AST walk in src/safety/guard.ts already visits FuncCall nodes — the hook point exists.
+- **Depends on:** nothing.
+
 ## Optional MCP adapter (alias-only)
 
 - **What:** Thin MCP server wrapping the same CLI core for MCP-only hosts.

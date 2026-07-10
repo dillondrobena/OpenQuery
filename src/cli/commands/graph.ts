@@ -136,11 +136,18 @@ export async function graphCommand(
   }
 }
 
-/** Hidden `__serve` subcommand: the detached child behind --no-wait. */
+/** Hidden `__serve` subcommand: the detached child behind --no-wait.
+ *  Max lifetime 4h: a forgotten detached viewer must not serve row data
+ *  until reboot (adversarial finding). */
+const DETACHED_MAX_LIFETIME_MS = 4 * 60 * 60 * 1000;
+
 export async function serveDetached(inputPath: string): Promise<void> {
   const raw = await fs.readFile(inputPath, 'utf8');
   const doc = await validateGraphDocument(raw);
   const served = await serveGraph(doc);
   process.stdout.write(`${served.url}\n`);
+  setTimeout(() => {
+    void served.close().finally(() => process.exit(0));
+  }, DETACHED_MAX_LIFETIME_MS);
   await new Promise(() => {});
 }

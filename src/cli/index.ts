@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { emitErrorAndExit } from './errors.js';
+import { CliError, emitErrorAndExit } from './errors.js';
 import { connectCommand } from './commands/connect.js';
 import { queryCommand } from './commands/query.js';
 import { schemaCommand } from './commands/schema.js';
@@ -12,6 +12,15 @@ import { demoCommand } from './commands/demo.js';
  * Read-only by construction; credentials enter via the interactive
  * `connect` prompt only and are never printed, logged, or shown to agents.
  */
+
+/** Garbage numeric flags must fail loudly — NaN silently disabled the row cap. */
+function parsePositiveInt(value: string, flag: string): number {
+  const n = Number.parseInt(value, 10);
+  if (!Number.isInteger(n) || n <= 0 || String(n) !== value.trim()) {
+    throw new CliError('PARSE_ERROR', `${flag} must be a positive integer, got: ${value}`);
+  }
+  return n;
+}
 
 const cleanups: Array<() => Promise<void>> = [];
 const registerCleanup = (fn: () => Promise<void>): void => {
@@ -59,8 +68,8 @@ program
   .requiredOption('--sql <sql>', 'a single SELECT / WITH...SELECT / plain EXPLAIN')
   .option('--params <json>', 'JSON array of bind parameters ($1, $2, ...) — values never go in SQL text')
   .option('--out <file>', 'write the full (row-capped) result set to a file')
-  .option('--max-rows <n>', 'row cap (default 500)', (v) => Number.parseInt(v, 10))
-  .option('--timeout <ms>', 'statement timeout in ms (default 10000)', (v) => Number.parseInt(v, 10))
+  .option('--max-rows <n>', 'row cap (default 500)', (v) => parsePositiveInt(v, '--max-rows'))
+  .option('--timeout <ms>', 'statement timeout in ms (default 10000)', (v) => parsePositiveInt(v, '--timeout'))
   .description('Run a guarded read-only query; prints a sample + receipt envelope')
   .action(async (alias: string, opts: { sql: string; params?: string; out?: string; maxRows?: number; timeout?: number }) => {
     await queryCommand(alias, {
