@@ -2,7 +2,8 @@
 
 Evidence explorer for databases: agent-agnostic Skill + local CLI that runs
 guarded read-only SQL against Postgres and renders entity graphs with SQL
-receipts. Design record: ~/.gstack/projects/OpenQuery/ (design doc + test plan).
+receipts. Deferred work and design rationale live in [TODOS.md](./TODOS.md);
+the Graph JSON contract is [schema/graph.schema.json](./schema/graph.schema.json).
 
 ## Architecture (v1)
 
@@ -29,8 +30,9 @@ receipts. Design record: ~/.gstack/projects/OpenQuery/ (design doc + test plan).
 ## Release
 
 - Two version files, always bumped together: `VERSION` holds 4-digit
-  `MAJOR.MINOR.PATCH.MICRO` (gstack-internal); `package.json` holds the 3-digit
-  npm semver. Any npm-visible release must bump at least PATCH.
+  `MAJOR.MINOR.PATCH.MICRO` (repo-internal; MICRO tracks non-npm-visible
+  changes); `package.json` holds the 3-digit npm semver. Any npm-visible
+  release must bump at least PATCH.
 - Ritual: bump both files → add CHANGELOG entry (user-voiced, dated) →
   `git tag v<MAJOR.MINOR.PATCH.MICRO>` → push the tag. `release.yml` tests,
   builds, and runs `npm publish --provenance`.
@@ -39,8 +41,6 @@ receipts. Design record: ~/.gstack/projects/OpenQuery/ (design doc + test plan).
   token-based publishing; it will fail (and shouldn't be fixed by adding one).
 - npm cannot republish an existing version; failed releases of an unpublished
   version can be retried via the workflow's manual dispatch.
-- `gh` CLI is not installed on this machine — check CI via the public GitHub
-  API or the Actions web UI.
 
 ## Invariants (do not weaken)
 
@@ -49,20 +49,3 @@ receipts. Design record: ~/.gstack/projects/OpenQuery/ (design doc + test plan).
 - Guard: fail closed; new mutation vectors get a test row, never a special case.
 - Numeric/int8/date values are strings end-to-end — receipts show money.
 
-## Skill routing
-
-When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
-
-Key routing rules:
-- Product ideas/brainstorming → invoke /office-hours
-- Strategy/scope → invoke /plan-ceo-review
-- Architecture → invoke /plan-eng-review
-- Design system/plan review → invoke /design-consultation or /plan-design-review
-- Full review pipeline → invoke /autoplan
-- Bugs/errors → invoke /investigate
-- QA/testing site behavior → invoke /qa or /qa-only
-- Code review/diff check → invoke /review
-- Visual polish → invoke /design-review
-- Ship/deploy/PR → invoke /ship or /land-and-deploy
-- Save progress → invoke /context-save
-- Resume context → invoke /context-restore

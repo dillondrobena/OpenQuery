@@ -6,3 +6,4 @@ coverage/
 .gstack/
 .claude/skills/openquery/
 graph.json
+CLAUDE.local.md
