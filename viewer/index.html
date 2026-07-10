@@ -15,12 +15,12 @@
   </div>
   <div class="badges">
     <span class="badge badge-safety" id="safety-badge">🔒 READ-ONLY</span>
-    <span class="badge badge-asserted" title="Nodes and edges were assembled by the AI agent; each receipt shows the exact SQL behind its edge. v2 derives the graph from the queries themselves and removes this badge.">graph: agent-asserted (v1)</span>
+    <span class="badge badge-asserted" tabindex="0" title="Nodes and edges were assembled by the AI agent; each receipt shows the exact SQL behind its edge. v2 derives the graph from the queries themselves and removes this badge.">graph: agent-asserted (v1)</span>
   </div>
 </header>
 <main class="main">
-  <div id="graph-canvas" class="canvas"></div>
-  <aside class="panel" id="panel">
+  <div id="graph-canvas" class="canvas" role="img" aria-label="Entity relationship graph. Click a node or edge to load its SQL receipt into the panel."></div>
+  <aside class="panel" id="panel" aria-label="SQL receipt panel" aria-live="polite">
     <div id="panel-empty" class="panel-empty">Click an edge or node to see its receipt.</div>
     <div id="panel-content" hidden>
       <h3 id="panel-title"></h3>
@@ -36,7 +36,7 @@
   <span id="counts"></span>
   <span>openquery v0.1 — localhost only</span>
 </footer>
-<div id="error-banner" class="error-banner" hidden></div>
+<div id="error-banner" class="error-banner" role="alert" hidden></div>
 <script src="force-graph.js"></script>
 <script src="app.js"></script>
 </body>
