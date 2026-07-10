@@ -33,6 +33,9 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      # Plugin layout duplicates the skill file; the copies must never drift.
+      - name: SKILL.md plugin-copy drift gate
+        run: cmp SKILL.md skills/openquery/SKILL.md
 
   test-windows:
     # DPAPI roundtrip + POSIX-mode no-op path only run here.

@@ -1,0 +1,14 @@
+{
+  "name": "openquery",
+  "description": "OpenQuery — evidence explorer for databases. One plugin: guarded read-only Postgres access for agents, with SQL-receipt entity graphs.",
+  "owner": {
+    "name": "Dillon Drobena"
+  },
+  "plugins": [
+    {
+      "name": "openquery",
+      "source": "./",
+      "description": "Evidence explorer for databases — guarded read-only Postgres queries with entity-graph answers and per-edge SQL receipts. Requires the openquery CLI (npm install -g openquery). The AI never sees your credentials."
+    }
+  ]
+}

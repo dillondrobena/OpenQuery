@@ -1,0 +1,12 @@
+{
+  "name": "openquery",
+  "description": "Safely explore and visualize Postgres data: guarded read-only SQL via the openquery CLI, answers rendered as entity graphs where every edge carries a SQL receipt. Credentials never enter the agent's context.",
+  "version": "0.1.1",
+  "author": {
+    "name": "Dillon Drobena"
+  },
+  "homepage": "https://github.com/dillondrobena/OpenQuery",
+  "repository": "https://github.com/dillondrobena/OpenQuery",
+  "license": "MIT",
+  "keywords": ["postgres", "sql", "database", "data-visualization", "read-only", "agent-skill"]
+}

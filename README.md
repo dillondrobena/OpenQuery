@@ -45,8 +45,15 @@ npm install -g openquery     # or keep using npx
 openquery connect mydb       # you run this; input hidden; stored locally
 ```
 
-Then point your agent at `SKILL.md` (Claude Code: drop it in
-`.claude/skills/openquery/`). The agent workflow: inspect schema summary →
+Claude Code users can install the skill as a plugin in two commands:
+
+```
+/plugin marketplace add dillondrobena/OpenQuery
+/plugin install openquery@openquery
+```
+
+Any other agent: point it at `SKILL.md` (or copy it to your agent's skills
+directory). The agent workflow: inspect schema summary →
 iterate guarded parameterized queries → assemble Graph JSON → render.
 
 ```bash
