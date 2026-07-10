@@ -179,7 +179,7 @@
       window.addEventListener('resize', function () {
         graph.width(canvasEl.clientWidth).height(canvasEl.clientHeight);
         clearTimeout(refitTimer);
-        refitTimer = setTimeout(function () { graph.zoomToFit(300, 90); }, 300);
+        refitTimer = setTimeout(function () { graph.zoomToFit(0, 90); }, 120);
       });
       window.__oqGraph = graph; // for automated QA (screen-coord lookups)
     })
