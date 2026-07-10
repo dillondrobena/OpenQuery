@@ -3,6 +3,12 @@
 All notable changes to OpenQuery are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/) · Versions: MAJOR.MINOR.PATCH.MICRO (npm publishes MAJOR.MINOR.PATCH).
 
+## [0.1.1.0] - 2026-07-10
+
+### Changed
+- npm package metadata: repository, homepage, bugs, and keywords — the npm page
+  now links to GitHub, and provenance attestations bind to the repo.
+
 ## [0.1.0.0] - 2026-07-10
 
 ### Added

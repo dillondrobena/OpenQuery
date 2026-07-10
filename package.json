@@ -1,8 +1,26 @@
 {
   "name": "openquery",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Evidence explorer for databases — an agent-agnostic skill + local CLI that safely queries Postgres and renders answers as interactive entity graphs with SQL receipts. Your credentials never enter the AI's context.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dillondrobena/OpenQuery.git"
+  },
+  "homepage": "https://github.com/dillondrobena/OpenQuery#readme",
+  "bugs": {
+    "url": "https://github.com/dillondrobena/OpenQuery/issues"
+  },
+  "keywords": [
+    "postgres",
+    "ai-agent",
+    "agent-skill",
+    "sql",
+    "data-visualization",
+    "graph",
+    "read-only",
+    "mcp-alternative"
+  ],
   "type": "module",
   "bin": {
     "openquery": "dist/cli/index.js"
