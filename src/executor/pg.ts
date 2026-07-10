@@ -1,5 +1,6 @@
 import pg from 'pg';
 import Cursor from 'pg-cursor';
+import { parse as parseConnectionString } from 'pg-connection-string';
 import {
   DEFAULT_MAX_ROWS,
   DEFAULT_TIMEOUT_MS,
@@ -7,6 +8,28 @@ import {
   type QueryOptions,
   type QueryOutcome,
 } from './types.js';
+
+/*
+ * SSL normalization. Connection strings carry ssl options as strings
+ * (`?sslmode=require`, `?ssl=true`); node-postgres crashes internally
+ * (`'key' in self.ssl`) when ssl reaches it as a non-object truthy value.
+ * Map libpq-style modes to what pg actually accepts:
+ *   disable/false            -> false        (no TLS)
+ *   verify-ca/verify-full    -> {}           (TLS, verify certificate)
+ *   require/prefer/true/...  -> { rejectUnauthorized: false }  (TLS, no verify
+ *                               — matches libpq `require` semantics)
+ * Object values pass through untouched (the user knew what they were doing).
+ */
+export function normalizeSsl(
+  ssl: unknown
+): false | Record<string, unknown> {
+  if (ssl === undefined || ssl === null || ssl === false) return false;
+  if (typeof ssl === 'object') return ssl as Record<string, unknown>;
+  const mode = String(ssl).toLowerCase();
+  if (mode === 'disable' || mode === 'false' || mode === '0' || mode === 'off') return false;
+  if (mode === 'verify-ca' || mode === 'verify-full') return {};
+  return { rejectUnauthorized: false };
+}
 
 // Exact-precision values: dates/timestamps stay strings (int8 and numeric
 // already arrive as strings from node-postgres). Never JS Dates or floats.
@@ -18,7 +41,19 @@ export class PgExecutor implements Executor {
   private readonly pool: pg.Pool;
 
   constructor(connectionString: string) {
-    this.pool = new pg.Pool({ connectionString, max: 2 });
+    const parsed = parseConnectionString(connectionString);
+    this.pool = new pg.Pool({
+      host: parsed.host ?? undefined,
+      port: parsed.port ? Number(parsed.port) : undefined,
+      user: parsed.user ?? undefined,
+      password: parsed.password ?? undefined,
+      database: parsed.database ?? undefined,
+      ssl: normalizeSsl(parsed.ssl),
+      max: 2,
+    });
+    // A dropped socket emits on idle pool clients; without this it becomes an
+    // uncaughtException that bypasses the JSON error contract.
+    this.pool.on('error', () => {});
   }
 
   /** Cheap connectivity probe used by `connect`. */

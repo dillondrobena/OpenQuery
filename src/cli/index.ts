@@ -30,6 +30,15 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   });
 }
 
+// Last-resort guard: the error contract (one JSON object on stderr) holds even
+// for crashes that escape command-level handling — users and agents must never
+// see a raw stack trace. Found by real-user dogfooding (pg SSL crash).
+for (const event of ['uncaughtException', 'unhandledRejection'] as const) {
+  process.on(event, (err: unknown) => {
+    void runCleanups().finally(() => emitErrorAndExit(err));
+  });
+}
+
 const program = new Command();
 program
   .name('openquery')
